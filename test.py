@@ -2,7 +2,7 @@ from socket import *
 import threading
 
 socket = socket(AF_INET,SOCK_STREAM)
-socket.connect(('139.129.129.186',12345))
+socket.connect(('139.129.129.186',12334))
 
 def read():
     while True:
@@ -23,5 +23,3 @@ def main():
 
 if __name__=='__main__':
     main()
-    s = "asdas asdasd asdasd asdas"
-    print s.count(" ",0,len(s))

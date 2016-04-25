@@ -1,6 +1,6 @@
 #! /usr/bin/python
 from socket import *
-from time import ctime
+import time
 import thread
 import threading
 from Queue import Queue
@@ -11,6 +11,7 @@ BUFSIZE = 1024
 serverSocket = socket(AF_INET, SOCK_STREAM)
 serverSocket.bind(('', PORT))
 serverSocket.listen(100)
+
 
 class User:
     def __init__(self, name,connectionSocket):
@@ -46,10 +47,12 @@ class UserNameSet:
         self.Set.remove(name)
         Map.__delitem__(name)
         self.lock.release()
-    def sendMsg(self,name,sendMsg):
+    def sendMsg(self,sndName,rcvName,sendMsg):
         self.lock.acquire()
-        if self.Set.__contains__(name):
-            Map[name].send(sendMsg)
+        if self.Set.__contains__(rcvName):
+            timeStr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            sendMsg = timeStr+": "+sndName+":"+sendMsg + "\n"
+            Map[rcvName].send(sendMsg)
         self.lock.release()
 
 uns = UserNameSet()
@@ -81,11 +84,11 @@ def tcp(connectionSocket):
             if str.startswith("query"):
                 connectionSocket.send(uns.getUserList())
             elif str.startswith("send"):
-                if str.count(" ") < 3:
+                if str.count(" ") < 2:
                     connectionSocket.send("query to show all user.  (send user msg) to send msg to user.  quit to quit\n");
                     continue
-                (noUse,userName,sendMsg) = str.spilt(" ",2)
-                uns.sendMsg(userName,sendMsg)
+                (noUse,userName,sendMsg) = str.split(" ",2)
+                uns.sendMsg(name,userName,sendMsg)
             elif str.startswith("quit"):
                 uns.delUser(name)
                 break
